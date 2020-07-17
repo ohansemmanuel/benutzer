@@ -1,26 +1,52 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchUserProfile } from "./actions";
+import "./App.css";
 
-function App() {
+const App = () => {
+  const dispatch = useDispatch();
+  const {
+    name = ". . .",
+    description = " . . .",
+    likes = " . . .",
+    location = " . . .",
+    profilePic,
+    isLoading = true,
+  } = useSelector((v) => v);
+
+  useEffect(() => {
+    dispatch(fetchUserProfile());
+  }, [dispatch]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className={`${!isLoading ? "App" : "App App--loading"}`}>
+      <div className="App__header">BENUTZER</div>
+      <section className="User__img">
+        {profilePic && <img src={profilePic} alt="user" />}
+      </section>
+
+      {!isLoading && (
+        <section className="User__info">
+          <p>
+            {" "}
+            <span className="faint">I am</span> a {description}
+          </p>
+          <p>
+            {" "}
+            <span className="faint">I like</span> {likes}
+          </p>
+          <p className="User__info__details User__info__divider faint">
+            <span>Name: </span>
+            <span>{name}</span>
+          </p>
+          <p className="User__info__details faint">
+            <span>Location: </span>
+            <span>{location}</span>
+          </p>
+        </section>
+      )}
     </div>
   );
-}
+};
 
 export default App;
