@@ -3,7 +3,7 @@
   width: 400px;
   height: 600px;
   border-radius: 9px;
-  font-size: 0.75em;
+  font-size: em;
   box-shadow: 0 27px 20px 5px rgba(0, 0, 0, 0.03);
 }
 .App__header {
