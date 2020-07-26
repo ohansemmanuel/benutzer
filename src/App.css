@@ -1,20 +1,30 @@
 .App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.Card {
   position: relative;
   width: 400px;
-  height: 600px;
+  min-height: 600px;
   border-radius: 9px;
-  font-size: em;
   box-shadow: 0 27px 20px 5px rgba(0, 0, 0, 0.03);
 }
-.App__header {
-  color: rgba(0, 0, 0, 0.15);
-  font-size: 1rem;
+.Card--mini {
+  min-height: initial;
+  width: initial;
+  border-radius: 50%;
+  box-shadow: 0 27px 20px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
-.App--loading {
+.Card--loading {
   overflow: hidden;
   position: relative;
 }
-.App--loading:after {
+.Card--loading:after {
   content: "";
   position: absolute;
   top: 0;
@@ -37,14 +47,25 @@
   border-top-left-radius: 9px;
   background: #ffd2fe;
 }
+.User__img--mini {
+  width: 100px;
+  height: 100px;
+  margin: 0 10px;
+  border-radius: 50%;
+}
 .User__img > img {
   max-width: 100%;
   position: absolute;
   bottom: 0;
 }
+.User__img--mini > img {
+  max-width: 100%;
+  border-radius: 50%;
+}
+
 .User__info {
   background: #fff;
-  height: 220px;
+  min-height: 250px;
   padding: 2rem;
   border-radius: 9px;
 }
