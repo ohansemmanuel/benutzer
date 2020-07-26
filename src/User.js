@@ -1,20 +1,12 @@
 import React from "react";
 
-const User = ({ profilePic, bio, likes, name, location, isLoading, mini }) => {
-  const showUserInfo = !isLoading && !mini;
-  const cardClassNames = [
-    !isLoading ? "Card" : "Card Card--loading",
-    mini && "Card--mini",
-  ].join(" ");
-
-  const userImgClassNames = ["User__img", mini && "User__img--mini"].join(" ");
-
+const User = ({ profilePic, bio, likes, name, location, isLoading }) => {
   return (
-    <div className={cardClassNames}>
-      <section className={userImgClassNames}>
+    <div className={!isLoading ? "Card" : "Card Card--loading"}>
+      <section className={"User__img"}>
         {profilePic && <img src={profilePic} alt="user" />}
       </section>
-      {showUserInfo && (
+      {!isLoading && (
         <section className="User__info">
           <p>
             <span role="img" aria-label="owl">
