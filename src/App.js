@@ -1,50 +1,73 @@
 import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { fetchUserProfile } from "./actions";
+import { atom, useRecoilState } from "recoil";
+import User from "./User";
 import "./App.css";
 
+const URL = "https://user-profile-json-j7n0j4c8ican.runkit.sh/";
+const fetchUserProfile = async () => await fetch(URL).then((res) => res.json());
+
+const userProfileState = atom({
+  key: "userProfile",
+  default: {},
+});
+
 const App = () => {
-  const dispatch = useDispatch();
+  const [userProfile, setUserProfile] = useRecoilState(userProfileState);
   const {
-    name = ". . .",
-    description = " . . .",
-    likes = " . . .",
-    location = " . . .",
+    name,
+    bio,
+    likes,
+    location,
     profilePic,
+    friends = [],
     isLoading = true,
-  } = useSelector((v) => v);
+  } = userProfile;
 
   useEffect(() => {
-    dispatch(fetchUserProfile());
-  }, [dispatch]);
+    console.log("fetching on mount");
+    fetchUserProfile().then((data) =>
+      setUserProfile({ ...data, isLoading: false })
+    );
+  }, [setUserProfile]);
+
+  const half = Math.ceil(friends.length / 2);
+  const firstHalf = friends.slice(0, half);
+  const secondHalf = friends.slice(-half);
 
   return (
-    <div className={`${!isLoading ? "App" : "App App--loading"}`}>
-      <div className="App__header">BENUTZER</div>
-      <section className="User__img">
-        {profilePic && <img src={profilePic} alt="user" />}
-      </section>
-
-      {!isLoading && (
-        <section className="User__info">
-          <p>
-            {" "}
-            <span className="faint">I am</span> a {description}
-          </p>
-          <p>
-            {" "}
-            <span className="faint">I like</span> {likes}
-          </p>
-          <p className="User__info__details User__info__divider faint">
-            <span>Name: </span>
-            <span>{name}</span>
-          </p>
-          <p className="User__info__details faint">
-            <span>Location: </span>
-            <span>{location}</span>
-          </p>
-        </section>
-      )}
+    <div className="App">
+      {!!friends.length &&
+        firstHalf.map((friendId) => (
+          <User
+            name={name}
+            profilePic={`https://i.imgur.com/${friendId}`}
+            bio={bio}
+            likes={likes}
+            location={location}
+            isLoading={isLoading}
+            mini
+          />
+        ))}
+      <User
+        name={name}
+        profilePic={profilePic}
+        bio={bio}
+        likes={likes}
+        location={location}
+        isLoading={isLoading}
+      />
+      {!!friends.length &&
+        secondHalf.map((friendId) => (
+          <User
+            name={name}
+            profilePic={`https://i.imgur.com/${friendId}`}
+            bio={bio}
+            likes={likes}
+            location={location}
+            isLoading={isLoading}
+            mini
+          />
+        ))}
     </div>
   );
 };
