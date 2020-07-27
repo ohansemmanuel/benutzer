@@ -7,10 +7,10 @@ import "./App.css";
 const App = () => {
   const dispatch = useDispatch();
   const {
-    name = ". . .",
+    name = "",
     bio,
-    likes = " . . .",
-    location = " . . .",
+    likes = " ",
+    location = " ",
     profilePic,
     isLoading = true,
   } = useSelector((v) => v);
