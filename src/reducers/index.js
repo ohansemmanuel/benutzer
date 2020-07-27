@@ -1,11 +1,18 @@
-import { SET_USER_PROFILE } from "../actions/types";
+import { SET_USER_PROFILE, SET_LOADING_DATA } from "../actions/types";
 
 const reducer = (state = {}, action) => {
-  switch (action.type) {
+  const { type, payload } = action;
+  switch (type) {
     case SET_USER_PROFILE:
       return {
-        ...action.payload,
+        ...payload,
         isLoading: false,
+      };
+
+    case SET_LOADING_DATA:
+      return {
+        ...state,
+        isLoading: payload,
       };
 
     default:
