@@ -1,59 +1,85 @@
-import React from "react";
-import { atom, useRecoilState, selectorFamily, useRecoilValue } from "recoil";
+import React, { useState } from "react";
+import {
+  atom,
+  useSetRecoilState,
+  selector,
+  selectorFamily,
+  useRecoilValue,
+  useRecoilValueLoadable,
+} from "recoil";
 import User, { UserPhoto } from "./User";
 import "./App.css";
 
 const URL = "https://user-profile-json-j7n0j4c8ican.runkit.sh/";
-const fetchUserProfile = async (id) =>
-  await fetch(`${URL}${id}`).then((res) => res.json());
+const fetchUserProfile = async (id) => {
+  return await fetch(`${URL}${id}`).then((res) => res.json());
+};
 
 const userIDState = atom({
   key: "currentUserId",
   default: "",
 });
 
-const userProfileState = selectorFamily({
+// const userProfileState = selector({
+//   key: "userProfile",
+//   get: async ({ get }) => {
+//     const id = get(userIDState);
+//     return await fetchUserProfile(id);
+//   },
+// });
+
+const userProfileStateQuery = selectorFamily({
   key: "userProfile",
-  get: (userId) => async ({ get }) => {
-    const id = get(userIDState);
+  get: (id) => async ({ get }) => {
     return await fetchUserProfile(id);
   },
 });
 
+const splitListInHalf = (list) => {
+  if (!list.length) return [[], []];
+
+  const half = Math.ceil(list.length / 2);
+  const firstHalf = list.slice(0, half);
+  const secondHalf = list.slice(-half);
+
+  return [firstHalf, secondHalf];
+};
+
 const App = () => {
-  const [currentUserId, setCurrentUserId] = useRecoilState(userIDState);
-  const userProfile = useRecoilValue(userProfileState(currentUserId));
-
-  console.log({ currentUserId });
+  // const setCurrentUserId = useSetRecoilState(userIDState);
+  const [currentUserId, setCurrentUserId] = useState("");
+  // const userProfile = useRecoilValue(userProfileState(currentUserId));
+  const userProfileLoadable = useRecoilValueLoadable(
+    userProfileStateQuery(currentUserId)
+  );
   const {
-    name,
-    bio,
-    likes,
-    location,
-    profilePic,
-    friends = [],
-    isLoading = false,
-  } = userProfile;
+    state: userProfileState,
+    contents: userProfile,
+  } = userProfileLoadable;
 
-  const half = Math.ceil(friends.length / 2);
-  const firstHalf = friends.slice(0, half);
-  const secondHalf = friends.slice(-half);
+  const isLoading = userProfileState === "loading";
+  const { name, bio, likes, location, profilePic, friends = [] } = userProfile;
+  const [firstHalf, secondHalf] = splitListInHalf(friends);
 
   const handleUserClick = (evt) => {
     setCurrentUserId(evt.currentTarget.dataset.id);
   };
 
+  const renderFriends = (friends) => {
+    if (isLoading) return null;
+
+    return friends.map((friendId) => (
+      <UserPhoto
+        profilePic={`https://i.imgur.com/${friendId}`}
+        onClick={handleUserClick}
+        userId={friendId}
+        key={friendId}
+      />
+    ));
+  };
   return (
     <div className="App">
-      {!!friends.length &&
-        firstHalf.map((friendId) => (
-          <UserPhoto
-            profilePic={`https://i.imgur.com/${friendId}`}
-            onClick={handleUserClick}
-            userId={friendId}
-            key={friendId}
-          />
-        ))}
+      {renderFriends(firstHalf)}
       <User
         name={name}
         profilePic={profilePic}
@@ -62,15 +88,7 @@ const App = () => {
         location={location}
         isLoading={isLoading}
       />
-      {!!friends.length &&
-        secondHalf.map((friendId) => (
-          <UserPhoto
-            profilePic={`https://i.imgur.com/${friendId}`}
-            onClick={handleUserClick}
-            userId={friendId}
-            key={friendId}
-          />
-        ))}
+      {renderFriends(secondHalf)}
     </div>
   );
 };
