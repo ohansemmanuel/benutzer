@@ -1,30 +1,26 @@
 import React from "react";
-import { atom, useRecoilState, selectorFamily, useRecoilValue } from "recoil";
+import { atom, selector, useRecoilValue, useSetRecoilState } from "recoil";
 import User, { UserPhoto } from "./User";
+import { fetchUserProfile } from "./api";
 import "./App.css";
-
-const URL = "https://user-profile-json-j7n0j4c8ican.runkit.sh/";
-const fetchUserProfile = async (id) =>
-  await fetch(`${URL}${id}`).then((res) => res.json());
 
 const userIDState = atom({
   key: "currentUserId",
   default: "",
 });
 
-const userProfileState = selectorFamily({
+const userProfileState = selector({
   key: "userProfile",
-  get: (userId) => async ({ get }) => {
+  get: async ({ get }) => {
     const id = get(userIDState);
     return await fetchUserProfile(id);
   },
 });
 
 const App = () => {
-  const [currentUserId, setCurrentUserId] = useRecoilState(userIDState);
-  const userProfile = useRecoilValue(userProfileState(currentUserId));
+  const setCurrentUserId = useSetRecoilState(userIDState);
+  const userProfile = useRecoilValue(userProfileState);
 
-  console.log({ currentUserId });
   const {
     name,
     bio,
